@@ -108,8 +108,10 @@ int checkbutton() {
 
     if (light == 7) {
       return light = 0;
+      delay(100);
     } else {
       return light ++;
+      delay(100);
     }
   }
 
