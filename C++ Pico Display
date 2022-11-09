@@ -1,0 +1,124 @@
+
+#include <Adafruit_GFX.h>    // Core graphics library
+#include <Adafruit_ST7735.h> // Hardware-specific library for ST7735
+#include <Adafruit_ST7789.h> // Hardware-specific library for ST7789
+#include <SPI.h>
+
+#define TFT_CS   17
+#define TFT_RST  -1 
+#define TFT_DC   16
+#define TFT_MOSI 19  
+#define TFT_SCLK 18  
+#define rotate   12
+#define change   13
+#define colours  14
+#define RGB_R    6
+#define RGB_G    7
+#define RGB_B    8
+
+int textsize = 3;
+int message = 0;
+int light = 0;
+
+char *insults[] = {"Dumb cunt", "Mong", "Failed life", "Harry", "Lizard", "Twiglet", "Shit stabber", "Dan Lampert"};
+
+unsigned char states [][3] = {
+  {0,0,0},
+  {1,0,0},
+  {0,1,0},
+  {0,0,1},
+  {1,1,0},
+  {1,0,1},
+  {0,1,1},
+  {1,1,1}
+};
+
+Adafruit_ST7789 tft = Adafruit_ST7789(TFT_CS, TFT_DC, TFT_MOSI, TFT_SCLK, TFT_RST);
+
+
+void setup(void) {
+
+  pinMode(rotate, INPUT_PULLUP);
+  pinMode(change, INPUT_PULLUP);
+  pinMode(colours, INPUT_PULLUP);
+  pinMode(RGB_R, OUTPUT);
+  pinMode(RGB_G, OUTPUT);
+  pinMode(RGB_B, OUTPUT);
+
+  Serial.begin(9600);
+  Serial.print(F("Hello!"));
+
+  tft.init(135, 240);       
+ 
+  Serial.println(F("Initialized"));
+
+  // block of text
+  tft.fillScreen(ST77XX_BLACK);
+  testdrawtext("Harry", ST77XX_WHITE, textsize);
+  delay(2000);
+  tft.setRotation(1);
+  tft.fillScreen(ST77XX_BLACK);
+  testdrawtext("Harry", ST77XX_WHITE, textsize);
+  delay(5000);
+  tft.fillScreen(ST77XX_BLACK);
+}
+
+void loop() {
+  
+  testdrawtext(insults[message], ST77XX_GREEN, textsize);
+  checkbutton();
+  setLight();
+}
+
+void testdrawtext(char *text, uint16_t color, int size) {
+  tft.setCursor(0, 0);
+  tft.setTextColor(color);
+  tft.setTextWrap(true);
+  tft.setTextSize(size);
+  tft.print(text);
+}
+
+int checkbutton() {
+
+  byte stateRotate = digitalRead(rotate);
+  byte stateChange = digitalRead(change);
+  byte stateColour = digitalRead(colours);
+
+  if (stateRotate == LOW) {
+
+    tft.fillScreen(ST77XX_BLACK);
+    tft.setRotation(tft.getRotation()+1);
+
+    if (tft.getRotation()%2 == 0) {
+      return textsize = 2;
+    } else {
+      return textsize = 3;
+    }
+    delay(200);
+  }
+  else if (stateChange == LOW) {
+
+    tft.fillScreen(ST77XX_BLACK);
+    
+    return message = random(8);
+    
+    delay(200);
+  }
+  else if (stateColour == LOW) {
+
+    if (light == 7) {
+      return light = 0;
+    } else {
+      return light ++;
+    }
+  }
+
+}
+
+void setLight() {
+
+  digitalWrite(RGB_R, states[light][0]);
+  digitalWrite(RGB_G, states[light][1]);
+  digitalWrite(RGB_B, states[light][2]);
+
+}
