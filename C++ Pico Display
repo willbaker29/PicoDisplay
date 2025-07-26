@@ -20,7 +20,7 @@ int textsize = 3;
 int message = 0;
 int light = 0;
 
-char *insults[] = {"Dumb cunt", "Mong", "Failed life", "Harry", "Lizard", "Twiglet", "Shit stabber", "Dan Lampert"};
+char *insults[] = {"Twat", "Twit", "Bum", "Dreamer", "Lizard", "Solid", "Idiot", "Dense"};
 
 unsigned char states [][3] = {
   {0,0,0},
